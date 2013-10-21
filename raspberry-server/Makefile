@@ -1,18 +1,16 @@
-CC=g++
-CFLAGS=-c -Wall
-LDFLAGS=
-SOURCES=main.cpp Accelerometer.cpp
-OBJECTS=$(SOURCES:.cpp=.o)
-EXECUTABLE=server
+all: server
 
-all: $(SOURCES) $(EXECUTABLE)
-	
-$(EXECUTABLE): $(OBJECTS) 
-	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
+HDRS = Accelerometer.h Motor.h
+CMN_OBJS = Accelerometer.o Motor.o
+DMP_OBJS = main.o
 
-.cpp.o:
-	$(CC) $(CFLAGS) $< -o $@
+CXXFLAGS = -DDMP_FIFO_RATE=9 -Wall -g -O2
+
+$(CMN_OBJS) $(DMP_OBJS) : $(HDRS)
+
+server: $(CMN_OBJS) $(DMP_OBJS)
+	$(CXX) -o $@ $^ -lm
 
 clean:
-	rm -rf *.o server
+	rm -f $(CMN_OBJS) $(DMP_OBJS) server
 

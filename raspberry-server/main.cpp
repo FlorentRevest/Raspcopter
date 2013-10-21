@@ -2,7 +2,7 @@
  * This file is part of Raspcopter.
  *
  * Copyright (C) 2013 - Florent Revest <florent.revest666@gmail.com>
-
+ *
  * Raspcopter is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -17,25 +17,55 @@
  * along with Raspcopter.  If not, see <http://www.gnu.org/licenses/>.
  * ================================================================== */
 
-#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <stdint.h>
+#include <string.h>
 #include "Accelerometer.h"
 
-int main(int argc, char *argv[])
+int main()
 {
-    Accelerometer *accel= new Accelerometer(); // Initialize the MPU6050
-    if(accel->isConnected())
-    	std::cout << "Accelerometer initialisation successful." << std::endl;
+    Accelerometer mpu;
+    if(mpu.isConnected())
+        printf("MPU6050 is alright !\n");
     else
     {
-    	std::cout << "Accelerometer initialisation error... Abort" << std::endl;
-    	return 1;
+        printf("MPU6050 got a problem.\n");
+        return 1;
+    }
+    mpu.setDMPEnabled(true);
+
+    uint16_t packetSize = mpu.getFIFOPacketSize();
+    uint8_t fifoBuffer[64];
+
+    Quaternion q;
+    VectorFloat gravity;
+    float ypr[3];
+
+    usleep(100000);
+
+    while(true)
+    {
+        uint16_t fifoCount = mpu.getFIFOCount();
+
+        if (fifoCount == 1024)
+        {
+            mpu.resetFIFO();
+            printf("FIFO overflow!\n");
+        }
+        else if (fifoCount >= 42)
+        {
+            mpu.getFIFOBytes(fifoBuffer, packetSize);
+        
+            mpu.getQuaternion(&q, fifoBuffer);
+            printf("quat %7.2f %7.2f %7.2f %7.2f    ", q.w,q.x,q.y,q.z);
+            mpu.getGravity(&gravity, &q);
+            mpu.getYawPitchRoll(ypr, &q, &gravity);
+            printf("ypr  %7.2f %7.2f %7.2f    ", ypr[0] * 180/M_PI, ypr[1] * 180/M_PI, ypr[2] * 180/M_PI);
+            printf("\n");
+        }
     }
 
-    while(1)
-    {
-   	    AccelGyroValues values = accel->getAccelGyroValues();
-    	std::cout << "accelerometer: " << values.ax << values.ay << values.az << std::endl
-    	          << "gyrometer: " << values.gx << values.gy << values.gz << std::endl;
-    }
     return 0;
 }
