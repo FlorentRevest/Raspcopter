@@ -17,32 +17,19 @@
  * along with Raspcopter.  If not, see <http://www.gnu.org/licenses/>.
  * ================================================================== */
 
-/* 
+/*
  * /!\ Huge thanks to Noah Zerkin and Jeff Rowberg, without their amazing work the MPU6050 couldn't be used !
- */ 
+ */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <string.h>
-#include <stdint.h>
-#include <errno.h>
-#include <sys/ioctl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <linux/i2c-dev.h>
 #include "Accelerometer.h"
 
 Accelerometer::Accelerometer()
 {
-    m_isConnected = true;
-
     m_i2cfd = open("/dev/i2c-1", O_RDWR);
     if(!m_i2cfd < 0)
-    	m_isConnected = false;
+        abort();
     if(ioctl(m_i2cfd, I2C_SLAVE, 0x68) < 0)
-    	m_isConnected = false;
+        abort();
 
     i2cWriteBits(MPU6050_RA_PWR_MGMT_1, MPU6050_PWR1_CLKSEL_BIT, MPU6050_PWR1_CLKSEL_LENGTH, MPU6050_CLOCK_PLL_XGYRO); // Set Clock source
     i2cWriteBits(MPU6050_RA_GYRO_CONFIG, MPU6050_GCONFIG_FS_SEL_BIT, MPU6050_GCONFIG_FS_SEL_LENGTH, MPU6050_GYRO_FS_250); // Full scale gyro range
@@ -50,7 +37,7 @@ Accelerometer::Accelerometer()
     i2cWriteBits(MPU6050_RA_PWR_MGMT_1, MPU6050_PWR1_SLEEP_BIT, 1, false); // Disable sleep mode
 
     i2cWriteBits(MPU6050_RA_PWR_MGMT_1, MPU6050_PWR1_DEVICE_RESET_BIT, 1, true); // Reset
-    usleep(30000); 
+    usleep(30000);
     i2cWriteBits(MPU6050_RA_PWR_MGMT_1, MPU6050_PWR1_SLEEP_BIT, 1, false); // Disable sleep mode
     setMemoryBank(0x10, true, true); // Get MPU hardware revision
     uint8_t value = 0x06; // Alright, this is dirty but a pointer to this value will be sent to every i2cWriteBytes...
@@ -77,11 +64,9 @@ Accelerometer::Accelerometer()
     i2cWriteBytes(MPU6050_RA_I2C_SLV0_ADDR, 1, &value);
     i2cWriteBits(MPU6050_RA_USER_CTRL, MPU6050_USERCTRL_I2C_MST_RESET_BIT, 1, true); // Reset I2C Master
     usleep(20000);
-    
-    if (writeMemoryBlock(dmpMemory, MPU6050_DMP_CODE_SIZE, 0, 0, true, true)) // Load DMP code into memory banks
-    {
-        if (writeDMPConfigurationSet(dmpConfig, MPU6050_DMP_CONFIG_SIZE, true)) // Let's write the DMP configuration
-        {
+
+    if (writeMemoryBlock(dmpMemory, MPU6050_DMP_CODE_SIZE, 0, 0, true, true)) { // Load DMP code into memory banks
+        if (writeDMPConfigurationSet(dmpConfig, MPU6050_DMP_CONFIG_SIZE, true)) { // Let's write the DMP configuration
             i2cWriteBits(MPU6050_RA_PWR_MGMT_1, MPU6050_PWR1_CLKSEL_BIT, MPU6050_PWR1_CLKSEL_LENGTH, MPU6050_CLOCK_PLL_ZGYRO); // Set clock source
             value = 0x12;
             i2cWriteBytes(MPU6050_RA_INT_ENABLE, 1, &value); // Enable 0x12 interuption
@@ -167,29 +152,22 @@ Accelerometer::Accelerometer()
             dmpPacketSize = 42;
             resetFIFO();
             getIntStatus();
-        }
-        else
-            m_isConnected = false;
-    }
-    else
-        m_isConnected = false;
+        } else
+            abort();
+    } else
+        abort();
 
-    if(m_isConnected)
-    {
-        i2cReadBits(MPU6050_RA_WHO_AM_I, MPU6050_WHO_AM_I_BIT, MPU6050_WHO_AM_I_LENGTH, buffer);
-        m_isConnected = buffer[0] == 0x34;
-    }
+    i2cReadBits(MPU6050_RA_WHO_AM_I, MPU6050_WHO_AM_I_BIT, MPU6050_WHO_AM_I_LENGTH, buffer);
+    if(buffer[0] != 0x34)
+        abort();
+
+    setDMPEnabled(true);
 }
 
 Accelerometer::~Accelerometer()
 {
-	close(m_i2cfd);
+    close(m_i2cfd);
     i2cWriteBits(MPU6050_RA_PWR_MGMT_1, MPU6050_PWR1_SLEEP_BIT, 1, true); // Enable sleep mode
-}
-
-bool Accelerometer::isConnected()
-{
-	return m_isConnected;
 }
 
 uint8_t Accelerometer::getQuaternion(int16_t *data, const uint8_t* packet)
@@ -207,15 +185,14 @@ uint8_t Accelerometer::getQuaternion(Quaternion *q, const uint8_t* packet)
 {
     int16_t qI[4];
     uint8_t status = getQuaternion(qI, packet);
-    if (status == 0)
-    {
+    if (status == 0) {
         q -> w = (float)qI[0] / 16384.0f;
         q -> x = (float)qI[1] / 16384.0f;
         q -> y = (float)qI[2] / 16384.0f;
         q -> z = (float)qI[3] / 16384.0f;
         return 0;
     }
-    return status; 
+    return status;
 }
 
 uint8_t Accelerometer::getGravity(VectorFloat *v, Quaternion *q)
@@ -281,12 +258,12 @@ void Accelerometer::setMemoryBank(uint8_t bank, bool prefetchEnabled, bool userB
     i2cWriteBytes(MPU6050_RA_BANK_SEL, 1, &bank);
 }
 
-void Accelerometer::readMemoryBlock(uint8_t *data, uint16_t dataSize, uint8_t bank, uint8_t address) {
+void Accelerometer::readMemoryBlock(uint8_t *data, uint16_t dataSize, uint8_t bank, uint8_t address)
+{
     setMemoryBank(bank);
     i2cWriteBytes(MPU6050_RA_MEM_START_ADDR, 1, &address); // Set memory start address
     uint8_t chunkSize;
-    for (uint16_t i = 0; i < dataSize;)
-    {
+    for (uint16_t i = 0; i < dataSize;) {
         chunkSize = MPU6050_DMP_MEMORY_CHUNK_SIZE;
         if (i + chunkSize > dataSize)
             chunkSize = dataSize - i;
@@ -294,12 +271,11 @@ void Accelerometer::readMemoryBlock(uint8_t *data, uint16_t dataSize, uint8_t ba
             chunkSize = 256 - address;
 
         i2cReadBytes(MPU6050_RA_MEM_R_W, chunkSize, data + i);
-        
+
         i += chunkSize;
         address += chunkSize;
 
-        if (i < dataSize)
-        {
+        if (i < dataSize) {
             if (address == 0)
                 bank++;
             setMemoryBank(bank);
@@ -320,8 +296,7 @@ bool Accelerometer::writeMemoryBlock(const uint8_t *data, uint16_t dataSize, uin
         verifyBuffer = (uint8_t *)malloc(MPU6050_DMP_MEMORY_CHUNK_SIZE);
     if (useProgMem)
         progBuffer = (uint8_t *)malloc(MPU6050_DMP_MEMORY_CHUNK_SIZE);
-    for (i = 0; i < dataSize;)
-    {
+    for (i = 0; i < dataSize;) {
         chunkSize = MPU6050_DMP_MEMORY_CHUNK_SIZE;
 
         if (i + chunkSize > dataSize)
@@ -329,22 +304,20 @@ bool Accelerometer::writeMemoryBlock(const uint8_t *data, uint16_t dataSize, uin
 
         if (chunkSize > 256 - address)
             chunkSize = 256 - address;
-        
+
         if (useProgMem)
             for (j = 0; j < chunkSize; j++)
                 progBuffer[j] = pgm_read_byte(data + i + j);
         else
             progBuffer = (uint8_t *)data + i;
-    
+
         i2cWriteBytes(MPU6050_RA_MEM_R_W, chunkSize, progBuffer);
 
-        if (verify && verifyBuffer)
-        {
+        if (verify && verifyBuffer) {
             setMemoryBank(bank);
             i2cWriteBytes(MPU6050_RA_MEM_START_ADDR, 1, &address); // Set memory start address
             i2cReadBytes(MPU6050_RA_MEM_R_W, chunkSize, verifyBuffer);
-            if (memcmp(progBuffer, verifyBuffer, chunkSize) != 0)
-            {
+            if (memcmp(progBuffer, verifyBuffer, chunkSize) != 0) {
                 free(verifyBuffer);
                 if (useProgMem)
                     free(progBuffer);
@@ -355,8 +328,7 @@ bool Accelerometer::writeMemoryBlock(const uint8_t *data, uint16_t dataSize, uin
         i += chunkSize;
         address += chunkSize;
 
-        if (i < dataSize)
-        {
+        if (i < dataSize) {
             if (address == 0)
                 bank++;
             setMemoryBank(bank);
@@ -378,31 +350,26 @@ bool Accelerometer::writeDMPConfigurationSet(const uint8_t *data, uint16_t dataS
         progBuffer = (uint8_t *)malloc(8);
 
     uint8_t bank, offset, length;
-    for (i = 0; i < dataSize;)
-    {
-        if (useProgMem)
-        {
+    for (i = 0; i < dataSize;) {
+        if (useProgMem) {
             bank = pgm_read_byte(data + i++);
             offset = pgm_read_byte(data + i++);
             length = pgm_read_byte(data + i++);
-        } else
-        {
+        } else {
             bank = data[i++];
             offset = data[i++];
             length = data[i++];
         }
 
-        if (length > 0)
-        {
-            if (useProgMem)
-            {
+        if (length > 0) {
+            if (useProgMem) {
                 if (sizeof(progBuffer) < length)
                     progBuffer = (uint8_t *)realloc(progBuffer, length);
                 for (j = 0; j < length; j++)
                     progBuffer[j] = pgm_read_byte(data + i + j);
             } else
                 progBuffer = (uint8_t *)data + i;
-            
+
             success = writeMemoryBlock(progBuffer, length, bank, offset, true);
             i += length;
         } else {
@@ -411,18 +378,15 @@ bool Accelerometer::writeDMPConfigurationSet(const uint8_t *data, uint16_t dataS
             else
                 special = data[i++];
 
-            if (special == 0x01)
-            {
+            if (special == 0x01) {
                 uint8_t value = 0x32;
                 i2cWriteBytes(MPU6050_RA_INT_ENABLE, 1, &value);
                 success = true;
-            }
-            else
+            } else
                 success = false;
         }
-        
-        if (!success)
-        {
+
+        if (!success) {
             if (useProgMem)
                 free(progBuffer);
             return false;
@@ -433,11 +397,10 @@ bool Accelerometer::writeDMPConfigurationSet(const uint8_t *data, uint16_t dataS
     return true;
 }
 
-int8_t Accelerometer::i2cReadBits(uint8_t regAddr, uint8_t bitStart, uint8_t length, uint8_t *data, uint16_t timeout)
+int8_t Accelerometer::i2cReadBits(uint8_t regAddr, uint8_t bitStart, uint8_t length, uint8_t *data)
 {
     uint8_t count, b;
-    if ((count = i2cReadBytes(regAddr, 1, &b, timeout)) != 0)
-    {
+    if ((count = i2cReadBytes(regAddr, 1, &b)) != 0) {
         uint8_t mask = ((1 << length) - 1) << (bitStart - length + 1);
         b &= mask;
         b >>= (bitStart - length + 1);
@@ -446,22 +409,18 @@ int8_t Accelerometer::i2cReadBits(uint8_t regAddr, uint8_t bitStart, uint8_t len
     return count;
 }
 
-int8_t Accelerometer::i2cReadBytes(uint8_t regAddr, uint8_t length, uint8_t *data, uint16_t timeout)
+int8_t Accelerometer::i2cReadBytes(uint8_t regAddr, uint8_t length, uint8_t *data)
 {
     int8_t count = 0;
-    if (write(m_i2cfd, &regAddr, 1) != 1)
-    {
+    if (write(m_i2cfd, &regAddr, 1) != 1) {
         fprintf(stderr, "Failed to write reg: %s\n", strerror(errno));
         return(-1);
     }
     count = read(m_i2cfd, data, length);
-    if (count < 0)
-    {
+    if (count < 0) {
         fprintf(stderr, "Failed to read device(%d): %s\n", count, ::strerror(errno));
         return(-1);
-    }
-    else if (count != length)
-    {
+    } else if (count != length) {
         fprintf(stderr, "Short read  from device, expected %d, got %d\n", length, count);
         return(-1);
     }
@@ -472,16 +431,14 @@ int8_t Accelerometer::i2cReadBytes(uint8_t regAddr, uint8_t length, uint8_t *dat
 bool Accelerometer::i2cWriteBits(uint8_t regAddr, uint8_t bitStart, uint8_t length, uint8_t data)
 {
     uint8_t b;
-    if (i2cReadBytes(regAddr, 1, &b) != 0)
-    {
+    if (i2cReadBytes(regAddr, 1, &b) != 0) {
         uint8_t mask = ((1 << length) - 1) << (bitStart - length + 1);
         data <<= (bitStart - length + 1);
         data &= mask;
         b &= ~(mask);
         b |= data;
         return i2cWriteBytes(regAddr, 1, &b);
-    }
-    else
+    } else
         return false;
 }
 
@@ -490,8 +447,7 @@ bool Accelerometer::i2cWriteBytes(uint8_t regAddr, uint8_t length, uint8_t* data
     int8_t count = 0;
     uint8_t buf[128];
 
-    if (length > 127)
-    {
+    if (length > 127) {
         fprintf(stderr, "Byte write count (%d) > 127\n", length);
         return(false);
     }
@@ -499,13 +455,10 @@ bool Accelerometer::i2cWriteBytes(uint8_t regAddr, uint8_t length, uint8_t* data
     buf[0] = regAddr;
     memcpy(buf+1,data,length);
     count = write(m_i2cfd, buf, length+1);
-    if (count < 0)
-    {
+    if (count < 0) {
         fprintf(stderr, "Failed to write device(%d): %s\n", count, ::strerror(errno));
         return(false);
-    }
-    else if (count != length+1)
-    {
+    } else if (count != length+1) {
         fprintf(stderr, "Short write to device, expected %d, got %d\n", length+1, count);
         return(false);
     }
@@ -518,27 +471,23 @@ bool Accelerometer::i2cWriteWords(uint8_t regAddr, uint8_t length, uint16_t* dat
     int8_t count = 0;
     uint8_t buf[128];
 
-    if (length > 63)
-    {
+    if (length > 63) {
         fprintf(stderr, "Word write count (%d) > 63\n", length);
         return(false);
     }
     buf[0] = regAddr;
-    for (int i = 0; i < length; i++)
-    {
+    for (int i = 0; i < length; i++) {
         buf[i*2+1] = data[i] >> 8;
         buf[i*2+2] = data[i];
     }
     count = write(m_i2cfd, buf, length*2+1);
-    if (count < 0)
-    {
+    if (count < 0) {
         fprintf(stderr, "Failed to write device(%d): %s\n", count, ::strerror(errno));
         return(false);
-    }
-    else if (count != length*2+1)
-    {
+    } else if (count != length*2+1) {
         fprintf(stderr, "Short write to device, expected %d, got %d\n", length+1, count);
         return(false);
     }
     return true;
 }
+

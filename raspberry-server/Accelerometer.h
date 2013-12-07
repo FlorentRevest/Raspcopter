@@ -20,164 +20,160 @@
 #ifndef _ACCELEROMETER_H_
 #define _ACCELEROMETER_H_
 
-#include <math.h>
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
+#include <fcntl.h>
+#include <unistd.h>
+#include <cstring>
+#include <cstdint>
+#include <errno.h>
+#include <sys/ioctl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <linux/i2c-dev.h>
 
 class Quaternion
 {
-    public:
-        float w;
-        float x;
-        float y;
-        float z;
-        
-        Quaternion()
-        {
-            w = 1.0f;
-            x = 0.0f;
-            y = 0.0f;
-            z = 0.0f;
-        }
-        
-        Quaternion(float nw, float nx, float ny, float nz)
-        {
-            w = nw;
-            x = nx;
-            y = ny;
-            z = nz;
-        }
+public:
+    float w;
+    float x;
+    float y;
+    float z;
 
-        Quaternion getProduct(Quaternion q)
-        {
-            return Quaternion(
-                w*q.w - x*q.x - y*q.y - z*q.z,  //     (Q1 * Q2).w = (w1w2 - x1x2 - y1y2 - z1z2)
-                w*q.x + x*q.w + y*q.z - z*q.y,  //     (Q1 * Q2).x = (w1x2 + x1w2 + y1z2 - z1y2)
-                w*q.y - x*q.z + y*q.w + z*q.x,  //     (Q1 * Q2).y = (w1y2 - x1z2 + y1w2 + z1x2)
-                w*q.z + x*q.y - y*q.x + z*q.w); //     (Q1 * Q2).z = (w1z2 + x1y2 - y1x2 + z1w2
-        }
+    Quaternion() {
+        w = 1.0f;
+        x = 0.0f;
+        y = 0.0f;
+        z = 0.0f;
+    }
 
-        Quaternion getConjugate()
-        {
-            return Quaternion(w, -x, -y, -z);
-        }
-        
-        float getMagnitude()
-        {
-            return sqrt(w*w + x*x + y*y + z*z);
-        }
-        
-        void normalize()
-        {
-            float m = getMagnitude();
-            w /= m;
-            x /= m;
-            y /= m;
-            z /= m;
-        }
-        
-        Quaternion getNormalized()
-        {
-            Quaternion r(w, x, y, z);
-            r.normalize();
-            return r;
-        }
+    Quaternion(float nw, float nx, float ny, float nz) {
+        w = nw;
+        x = nx;
+        y = ny;
+        z = nz;
+    }
+
+    Quaternion getProduct(Quaternion q) {
+        return Quaternion(
+            w*q.w - x*q.x - y*q.y - z*q.z,  //     (Q1 * Q2).w = (w1w2 - x1x2 - y1y2 - z1z2)
+            w*q.x + x*q.w + y*q.z - z*q.y,  //     (Q1 * Q2).x = (w1x2 + x1w2 + y1z2 - z1y2)
+            w*q.y - x*q.z + y*q.w + z*q.x,  //     (Q1 * Q2).y = (w1y2 - x1z2 + y1w2 + z1x2)
+            w*q.z + x*q.y - y*q.x + z*q.w); //     (Q1 * Q2).z = (w1z2 + x1y2 - y1x2 + z1w2
+    }
+
+    Quaternion getConjugate() {
+        return Quaternion(w, -x, -y, -z);
+    }
+
+    float getMagnitude() {
+        return sqrt(w*w + x*x + y*y + z*z);
+    }
+
+    void normalize() {
+        float m = getMagnitude();
+        w /= m;
+        x /= m;
+        y /= m;
+        z /= m;
+    }
+
+    Quaternion getNormalized() {
+        Quaternion r(w, x, y, z);
+        r.normalize();
+        return r;
+    }
 };
 
 class VectorFloat
 {
-    public:
-        float x;
-        float y;
-        float z;
+public:
+    float x;
+    float y;
+    float z;
 
-        VectorFloat()
-        {
-            x = 0;
-            y = 0;
-            z = 0;
-        }
-        
-        VectorFloat(float nx, float ny, float nz)
-        {
-            x = nx;
-            y = ny;
-            z = nz;
-        }
+    VectorFloat() {
+        x = 0;
+        y = 0;
+        z = 0;
+    }
 
-        float getMagnitude()
-        {
-            return sqrt(x*x + y*y + z*z);
-        }
+    VectorFloat(float nx, float ny, float nz) {
+        x = nx;
+        y = ny;
+        z = nz;
+    }
 
-        void normalize()
-        {
-            float m = getMagnitude();
-            x /= m;
-            y /= m;
-            z /= m;
-        }
-        
-        VectorFloat getNormalized()
-        {
-            VectorFloat r(x, y, z);
-            r.normalize();
-            return r;
-        }
-        
-        void rotate(Quaternion *q)
-        {
-            Quaternion p(0, x, y, z);
-            p = q -> getProduct(p);
-            p = p.getProduct(q -> getConjugate());
-            x = p.x;
-            y = p.y;
-            z = p.z;
-        }
+    float getMagnitude() {
+        return sqrt(x*x + y*y + z*z);
+    }
 
-        VectorFloat getRotated(Quaternion *q)
-        {
-            VectorFloat r(x, y, z);
-            r.rotate(q);
-            return r;
-        }
+    void normalize() {
+        float m = getMagnitude();
+        x /= m;
+        y /= m;
+        z /= m;
+    }
+
+    VectorFloat getNormalized() {
+        VectorFloat r(x, y, z);
+        r.normalize();
+        return r;
+    }
+
+    void rotate(Quaternion *q) {
+        Quaternion p(0, x, y, z);
+        p = q -> getProduct(p);
+        p = p.getProduct(q -> getConjugate());
+        x = p.x;
+        y = p.y;
+        z = p.z;
+    }
+
+    VectorFloat getRotated(Quaternion *q) {
+        VectorFloat r(x, y, z);
+        r.rotate(q);
+        return r;
+    }
 };
 
-class Accelerometer {
-    public:
-        Accelerometer();
-        ~Accelerometer();
-        bool isConnected();
+class Accelerometer
+{
+public:
+    Accelerometer();
+    ~Accelerometer();
 
-        uint8_t getQuaternion(int16_t *data, const uint8_t* packet=0);
-        uint8_t getQuaternion(Quaternion *q, const uint8_t* packet=0);
-        uint8_t getGravity(VectorFloat *v, Quaternion *q);
-        uint8_t getYawPitchRoll(float *data, Quaternion *q, VectorFloat *gravity);
-        
-        void setRate(uint8_t rate);
-        uint8_t getIntStatus();
-        void setFIFOEnabled(bool enabled);
-        void resetFIFO();
-        uint16_t getFIFOCount();
-        uint16_t getFIFOPacketSize();
-        void getFIFOBytes(uint8_t *data, uint8_t length);
-        void setDMPEnabled(bool enabled);
-        
-        void setMemoryBank(uint8_t bank, bool prefetchEnabled=false, bool userBank=false);
-        void readMemoryBlock(uint8_t *data, uint16_t dataSize, uint8_t bank=0, uint8_t address=0);
-        bool writeMemoryBlock(const uint8_t *data, uint16_t dataSize, uint8_t bank=0, uint8_t address=0, bool verify=true, bool useProgMem=false);
-        bool writeDMPConfigurationSet(const uint8_t *data, uint16_t dataSize, bool useProgMem=false);
+    uint8_t getQuaternion(int16_t *data, const uint8_t* packet=0);
+    uint8_t getQuaternion(Quaternion *q, const uint8_t* packet=0);
+    uint8_t getGravity(VectorFloat *v, Quaternion *q);
+    uint8_t getYawPitchRoll(float *data, Quaternion *q, VectorFloat *gravity);
 
-        int8_t i2cReadBits(uint8_t regAddr, uint8_t bitStart, uint8_t length, uint8_t *data, uint16_t timeout=0);
-        int8_t i2cReadBytes(uint8_t regAddr, uint8_t length, uint8_t *data, uint16_t timeout=0);
-        bool i2cWriteBits(uint8_t regAddr, uint8_t bitStart, uint8_t length, uint8_t data);
-        bool i2cWriteBytes(uint8_t regAddr, uint8_t length, uint8_t* data);
-        bool i2cWriteWords(uint8_t regAddr, uint8_t length, uint16_t* data);
+    void setRate(uint8_t rate);
+    uint8_t getIntStatus();
+    void setFIFOEnabled(bool enabled);
+    void resetFIFO();
+    uint16_t getFIFOCount();
+    uint16_t getFIFOPacketSize();
+    void getFIFOBytes(uint8_t *data, uint8_t length);
+    void setDMPEnabled(bool enabled);
 
-    private:
-        uint8_t *dmpPacketBuffer;
-        uint16_t dmpPacketSize;
-        uint8_t buffer[14];
-	    int m_i2cfd;
-	    bool m_isConnected;
+    void setMemoryBank(uint8_t bank, bool prefetchEnabled=false, bool userBank=false);
+    void readMemoryBlock(uint8_t *data, uint16_t dataSize, uint8_t bank=0, uint8_t address=0);
+    bool writeMemoryBlock(const uint8_t *data, uint16_t dataSize, uint8_t bank=0, uint8_t address=0, bool verify=true, bool useProgMem=false);
+    bool writeDMPConfigurationSet(const uint8_t *data, uint16_t dataSize, bool useProgMem=false);
+
+    int8_t i2cReadBits(uint8_t regAddr, uint8_t bitStart, uint8_t length, uint8_t *data);
+    int8_t i2cReadBytes(uint8_t regAddr, uint8_t length, uint8_t *data);
+    bool i2cWriteBits(uint8_t regAddr, uint8_t bitStart, uint8_t length, uint8_t data);
+    bool i2cWriteBytes(uint8_t regAddr, uint8_t length, uint8_t* data);
+    bool i2cWriteWords(uint8_t regAddr, uint8_t length, uint16_t* data);
+
+private:
+    uint8_t *dmpPacketBuffer;
+    uint16_t dmpPacketSize;
+    uint8_t buffer[14];
+    int m_i2cfd;
 };
 
 #define pgm_read_byte(p) (*(uint8_t *)(p))
