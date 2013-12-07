@@ -17,52 +17,54 @@
  * along with Raspcopter.  If not, see <http://www.gnu.org/licenses/>.
  * ================================================================== */
 
-#include "Motor.h"
+#include "Motors.h"
 
-Motor::Motor(unsigned char channel)
+Motors::Motors()
 {
-	m_channel = channel;
-}
-
-int Motor::getSpeed()
-{
-    int fd = open("/dev/ttyACM0", O_RDWR | O_NOCTTY);
-    if (fd == -1)
-    	return -1;
+    // Open the Pololu Maestro file descriptor
+    m_fd = open("/dev/ttyACM0", O_RDWR | O_NOCTTY);
+    if(m_fd != -1)
+        abort();
 
     struct termios options;
-    tcgetattr(fd, &options);
+    tcgetattr(m_fd, &options);
     options.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
     options.c_oflag &= ~(ONLCR | OCRNL);
-    tcsetattr(fd, TCSANOW, &options);
+    tcsetattr(m_fd, TCSANOW, &options);
+}
 
-    unsigned char command[] = {0x90, m_channel};
-    if(write(fd, command, sizeof(command)) == -1)
+unsigned short Motors::getSpeed(unsigned char channel)
+{
+    unsigned char command[] = {0x90, channel};
+    if(write(m_fd, command, sizeof(command)) == -1)
         return -1;
 
     unsigned char response[2];
-    if(read(fd,response,2) != 2)
+    if(read(m_fd, response, 2) != 2)
         return -1;
 
-    close(fd);
     return response[0] + 256*response[1];
 }
- 
-bool Motor::setSpeed(unsigned short target)
+
+bool Motors::setSpeed(unsigned char channel, unsigned short target)
 {
-    int fd = open("/dev/ttyACM0", O_RDWR | O_NOCTTY);
-    if (fd == -1)
-    	return -1;
-
-    struct termios options;
-    tcgetattr(fd, &options);
-    options.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
-    options.c_oflag &= ~(ONLCR | OCRNL);
-    tcsetattr(fd, TCSANOW, &options);
-
-    unsigned char command[] = {0x84, m_channel, target & 0x7F, target >> 7 & 0x7F};
-    if(write(fd, command, sizeof(command)) == -1)
+    unsigned char command[] = {0x84, channel, (unsigned char)(target & 0x7F, target >> 7 & 0x7F)};
+    if(write(m_fd, command, sizeof(command)) == -1)
         return false;
     return true;
+}
+
+void Motors::safeLand()
+{
+    // Not so safe for now...
+    setSpeed(MOTOR_FL, 0);
+    setSpeed(MOTOR_FR, 0);
+    setSpeed(MOTOR_BL, 0);
+    setSpeed(MOTOR_BR, 0);
+}
+
+Motors::~Motors()
+{
+    close(m_fd);
 }
 

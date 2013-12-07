@@ -17,55 +17,54 @@
  * along with Raspcopter.  If not, see <http://www.gnu.org/licenses/>.
  * ================================================================== */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <stdint.h>
-#include <string.h>
+#include <cstdint>
+
 #include "Accelerometer.h"
+#include "PID.h"
+#include "Motors.h"
+#include "Logger.h"
+
+// TODO: Calibrate the horizontal values with 6 seconds mesurements
+// TODO: Logger class -> exports csv
+// TODO: Network class
+// TODO: Signals handler
+// TODO: Compute motor speed from PIDs sum
 
 int main()
 {
     Accelerometer mpu;
-    if(mpu.isConnected())
-        printf("MPU6050 is alright !\n");
-    else
-    {
-        printf("MPU6050 got a problem.\n");
-        return 1;
-    }
-    mpu.setDMPEnabled(true);
-
-    uint16_t packetSize = mpu.getFIFOPacketSize();
-    uint8_t fifoBuffer[64];
-
-    Quaternion q;
-    VectorFloat gravity;
-    float ypr[3];
+    PID y_pid(1, 0, 0);
+    PID p_pid(1, 0, 0);
+    PID r_pid(1, 0, 0);
+    Motors motors;
+    Logger logger;
 
     usleep(100000);
 
-    while(true)
-    {
-        uint16_t fifoCount = mpu.getFIFOCount();
+    uint8_t fifoBuffer[64];
+    Quaternion q;
+    VectorFloat gravity;
+    float ypr[3], y_target = 0, p_target = 0, r_target = 0;
+    uint16_t packetSize = mpu.getFIFOPacketSize();
 
+    while(true) {
+        uint16_t fifoCount = mpu.getFIFOCount();
         if (fifoCount == 1024)
-        {
-            mpu.resetFIFO();
-            printf("FIFO overflow!\n");
-        }
-        else if (fifoCount >= 42)
-        {
+            mpu.resetFIFO(); // FIFO overflow
+        else if (fifoCount >= 42) {
             mpu.getFIFOBytes(fifoBuffer, packetSize);
-        
             mpu.getQuaternion(&q, fifoBuffer);
-            printf("quat %7.2f %7.2f %7.2f %7.2f    ", q.w,q.x,q.y,q.z);
             mpu.getGravity(&gravity, &q);
             mpu.getYawPitchRoll(ypr, &q, &gravity);
-            printf("ypr  %7.2f %7.2f %7.2f    ", ypr[0] * 180/M_PI, ypr[1] * 180/M_PI, ypr[2] * 180/M_PI);
-            printf("\n");
+
+            float y = ypr[0] * 180/M_PI, p  = ypr[1] * 180/M_PI, r = ypr[2] * 180/M_PI;
+            float y_computed = y_pid.compute(y, y_target), p_computed = p_pid.compute(p, p_target), r_computed = r_pid.compute(r, r_target);
+
+            std::cout << "y=" << y_computed << ", p=" << p_computed << ", r=" << r_computed << std::endl;
         }
     }
 
-    return 0;
+    motors.safeLand();
+    exit(EXIT_SUCCESS);
 }
+

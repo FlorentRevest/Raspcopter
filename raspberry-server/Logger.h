@@ -17,24 +17,18 @@
  * along with Raspcopter.  If not, see <http://www.gnu.org/licenses/>.
  * ================================================================== */
 
-#ifndef _MOTOR_H_
-#define _MOTOR_H_
+#ifndef _LOGGER_H_
+#define _LOGGER_H_
 
-#include <fcntl.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <termios.h>
+#include <iostream>
 
-class Motor
+class Logger
 {
 public:
-	Motor(unsigned char);
-	int getSpeed();
-	bool setSpeed(unsigned short);
+    Logger();
+    ~Logger();
 
-public:
-	unsigned char m_channel;
 };
 
-#endif // _MOTOR_H
+#endif // _LOGGER_H
 

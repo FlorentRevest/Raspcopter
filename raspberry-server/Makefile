@@ -1,16 +1,20 @@
 all: server
 
-HDRS = Accelerometer.h Motor.h
-CMN_OBJS = Accelerometer.o Motor.o
-DMP_OBJS = main.o
+HDRS = Accelerometer.h Motors.h PID.h Logger.h Network.h
+OBJS = main.o Accelerometer.o Motors.o PID.o Logger.o Network.o
 
-CXXFLAGS = -DDMP_FIFO_RATE=9 -Wall -g -O2
+CXXFLAGS = -Wall -Wextra -O2 -std=c++0x
 
-$(CMN_OBJS) $(DMP_OBJS) : $(HDRS)
+$(OBJS) : $(HDRS)
 
-server: $(CMN_OBJS) $(DMP_OBJS)
-	$(CXX) -o $@ $^ -lm
+server: $(OBJS)
+		$(CXX) -o $@ $^ -lm
 
 clean:
-	rm -f $(CMN_OBJS) $(DMP_OBJS) server
+		rm -f $(OBJS) server
 
+sendToRpi:
+		scp -r ~/Programmation/Raspcopter/raspberry-server/* raspberrypi:~/server
+
+getFromRpi:
+		scp -r raspberrypi:~/server/* ~/Programmation/Raspcopter/raspberry-server
