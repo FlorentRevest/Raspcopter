@@ -21,42 +21,41 @@
 
 Motors::Motors()
 {
-    // Open the Pololu Maestro file descriptor
-    m_fd = open("/dev/ttyACM0", O_RDWR | O_NOCTTY);
-    if(m_fd != -1)
-        abort();
+    ctx = 0;
+    libusb_init(&ctx);
+    libusb_device **device_list = 0;
+    int count = libusb_get_device_list(ctx, &device_list);
 
-    struct termios options;
-    tcgetattr(m_fd, &options);
-    options.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
-    options.c_oflag &= ~(ONLCR | OCRNL);
-    tcsetattr(m_fd, TCSANOW, &options);
+    for(int i=0 ; i < count ; i++) {
+        libusb_device *device = device_list[i];
+        libusb_device_descriptor desc;
+        libusb_get_device_descriptor(device, &desc);
+
+        if(desc.idVendor == 0x1ffb && desc.idProduct == 0x0089) {
+            libusb_open(device, &device_handle);
+            break;
+        }
+    }
+
+    libusb_free_device_list(device_list, 0);
+
+    for(int i=0 ; i<6 ; i++)
+        speeds[i] = 0;
 }
 
 unsigned short Motors::getSpeed(unsigned char channel)
 {
-    unsigned char command[] = {0x90, channel};
-    if(write(m_fd, command, sizeof(command)) == -1)
-        return -1;
-
-    unsigned char response[2];
-    if(read(m_fd, response, 2) != 2)
-        return -1;
-
-    return response[0] + 256*response[1];
+    return speeds[channel];
 }
 
-bool Motors::setSpeed(unsigned char channel, unsigned short target)
+void Motors::setSpeed(unsigned char channel, unsigned short target)
 {
-    unsigned char command[] = {0x84, channel, (unsigned char)(target & 0x7F, target >> 7 & 0x7F)};
-    if(write(m_fd, command, sizeof(command)) == -1)
-        return false;
-    return true;
+    libusb_control_transfer(device_handle, 0x40, 0x85, 1000 + target*4, channel, 0, 0, (ushort)5000);
+    speeds[channel] = target;
 }
 
-void Motors::safeLand()
+void Motors::setToZero()
 {
-    // Not so safe for now...
     setSpeed(MOTOR_FL, 0);
     setSpeed(MOTOR_FR, 0);
     setSpeed(MOTOR_BL, 0);
@@ -65,6 +64,7 @@ void Motors::safeLand()
 
 Motors::~Motors()
 {
-    close(m_fd);
+    libusb_close(device_handle);
+    libusb_exit(ctx);
 }
 

@@ -39,14 +39,14 @@ int main()
     Motors motors;
     Logger logger;
 
-    usleep(100000);
-
     uint8_t fifoBuffer[64];
     Quaternion q;
     VectorFloat gravity;
     float ypr[3], y_target = 0, p_target = 0, r_target = 0;
     uint16_t packetSize = mpu.getFIFOPacketSize();
 
+    
+    motors.setToZero();
     while(true) {
         uint16_t fifoCount = mpu.getFIFOCount();
         if (fifoCount == 1024)
@@ -64,7 +64,6 @@ int main()
         }
     }
 
-    motors.safeLand();
     exit(EXIT_SUCCESS);
 }
 

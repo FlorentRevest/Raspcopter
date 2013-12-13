@@ -26,6 +26,8 @@
 #include <unistd.h>
 #include <termios.h>
 
+#include <libusb.h>
+
 // These are the channels I chose on my Pololu Maestro for every ESC
 #define MOTOR_FL 5
 #define MOTOR_FR 3
@@ -38,11 +40,13 @@ public:
     Motors();
     ~Motors();
     unsigned short getSpeed(unsigned char channel);
-    bool setSpeed(unsigned char channel, unsigned short target);
-    void safeLand();
+    void setSpeed(unsigned char channel, unsigned short target);
+    void setToZero();
 
 private:
-    int m_fd;
+    libusb_context *ctx; 
+    libusb_device_handle *device_handle;
+    unsigned short speeds[6];
 };
 
 #endif // _MOTORS_H
