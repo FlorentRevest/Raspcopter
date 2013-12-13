@@ -43,13 +43,13 @@ float PID::compute(float input, float setpoint)
     gettimeofday(&tv, 0);
     long time = tv.tv_sec * 1000 + tv.tv_usec/1000.0 + 0.5;
     long deltaTime = time - lastTime;
-    int error = setpoint - input;
+    float error = setpoint - input;
     long deltaError = error - lastError;
 
     float proportional = error * kp;
     integral += error * deltaTime * ki;
-    integral = std::max(integral, (float)5000);
-    integral = std::min(integral, (float)-5000);
+    integral = std::min(integral, (float)5000);
+    integral = std::max(integral, (float)-5000);
     float derivative = deltaError * kd / deltaTime;
 
     lastError = error;
