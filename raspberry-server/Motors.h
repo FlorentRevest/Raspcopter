@@ -1,7 +1,7 @@
 /* ====================================================================
  * This file is part of Raspcopter.
  *
- * Copyright (C) 2013 - Florent Revest <florent.revest666@gmail.com>
+ * Copyright (C) 2014 - Florent Revest <florent.revest666@gmail.com>
 
  * Raspcopter is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ public:
     void setToZero();
 
 private:
-    libusb_context *ctx; 
+    libusb_context *ctx;
     libusb_device_handle *device_handle;
     unsigned short speeds[6];
 };

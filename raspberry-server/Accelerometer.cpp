@@ -1,7 +1,7 @@
 /* ====================================================================
  * This file is part of Raspcopter.
  *
- * Copyright (C) 2013 - Florent Revest <florent.revest666@gmail.com>
+ * Copyright (C) 2014 - Florent Revest <florent.revest666@gmail.com>
  *
  * Raspcopter is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -211,6 +211,20 @@ uint8_t Accelerometer::getYawPitchRoll(float *data, Quaternion *q, VectorFloat *
     return 0;
 }
 
+uint8_t Accelerometer::getYawPitchRoll(float *data)
+{
+    uint8_t fifoBuffer[64];
+    Quaternion q;
+    VectorFloat gravity;
+    uint16_t packetSize = getFIFOPacketSize();
+
+    getFIFOBytes(fifoBuffer, packetSize);
+    getQuaternion(&q, fifoBuffer);
+    getGravity(&gravity, &q);
+    getYawPitchRoll(data, &q, &gravity);
+    return 0;
+}
+
 uint16_t Accelerometer::getFIFOPacketSize()
 {
     return dmpPacketSize;
@@ -235,7 +249,14 @@ void Accelerometer::resetFIFO()
 uint16_t Accelerometer::getFIFOCount()
 {
     i2cReadBytes(MPU6050_RA_FIFO_COUNTH, 2, buffer);
-    return (((uint16_t)buffer[0]) << 8) | buffer[1];
+    uint16_t ret = (((uint16_t)buffer[0]) << 8) | buffer[1];
+    if(ret == 1024)
+    {
+        resetFIFO();
+        return 0;
+    }
+    else
+        return ret;
 }
 
 void Accelerometer::getFIFOBytes(uint8_t *data, uint8_t length)
@@ -288,7 +309,7 @@ bool Accelerometer::writeMemoryBlock(const uint8_t *data, uint16_t dataSize, uin
     setMemoryBank(bank);
     i2cWriteBytes(MPU6050_RA_MEM_START_ADDR, 1, &address); // Set Memory start address
     uint8_t chunkSize;
-    uint8_t *verifyBuffer;
+    uint8_t *verifyBuffer = NULL;
     uint8_t *progBuffer = NULL;
     uint16_t i;
     uint8_t j;

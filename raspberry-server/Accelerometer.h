@@ -1,7 +1,7 @@
 /* ====================================================================
  * This file is part of Raspcopter.
  *
- * Copyright (C) 2013 - Florent Revest <florent.revest666@gmail.com>
+ * Copyright (C) 2014 - Florent Revest <florent.revest666@gmail.com>
 
  * Raspcopter is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -57,10 +57,10 @@ public:
 
     Quaternion getProduct(Quaternion q) {
         return Quaternion(
-            w*q.w - x*q.x - y*q.y - z*q.z,  //     (Q1 * Q2).w = (w1w2 - x1x2 - y1y2 - z1z2)
-            w*q.x + x*q.w + y*q.z - z*q.y,  //     (Q1 * Q2).x = (w1x2 + x1w2 + y1z2 - z1y2)
-            w*q.y - x*q.z + y*q.w + z*q.x,  //     (Q1 * Q2).y = (w1y2 - x1z2 + y1w2 + z1x2)
-            w*q.z + x*q.y - y*q.x + z*q.w); //     (Q1 * Q2).z = (w1z2 + x1y2 - y1x2 + z1w2
+                   w*q.w - x*q.x - y*q.y - z*q.z,  //     (Q1 * Q2).w = (w1w2 - x1x2 - y1y2 - z1z2)
+                   w*q.x + x*q.w + y*q.z - z*q.y,  //     (Q1 * Q2).x = (w1x2 + x1w2 + y1z2 - z1y2)
+                   w*q.y - x*q.z + y*q.w + z*q.x,  //     (Q1 * Q2).y = (w1y2 - x1z2 + y1w2 + z1x2)
+                   w*q.z + x*q.y - y*q.x + z*q.w); //     (Q1 * Q2).z = (w1z2 + x1y2 - y1x2 + z1w2
     }
 
     Quaternion getConjugate() {
@@ -148,6 +148,7 @@ public:
     uint8_t getQuaternion(Quaternion *q, const uint8_t* packet=0);
     uint8_t getGravity(VectorFloat *v, Quaternion *q);
     uint8_t getYawPitchRoll(float *data, Quaternion *q, VectorFloat *gravity);
+    uint8_t getYawPitchRoll(float *data);
 
     void setRate(uint8_t rate);
     uint8_t getIntStatus();
