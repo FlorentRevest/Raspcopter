@@ -1,0 +1,8 @@
+<RCC>
+  <qresource prefix="/" >
+    <file>temp_gauge.qjs</file>
+    <file>temp_gauge.svg</file>
+    <file>spce_black.svg</file>
+    <file>spce_blue.svg</file>
+  </qresource>
+</RCC>

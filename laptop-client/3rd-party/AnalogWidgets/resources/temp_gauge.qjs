@@ -1,0 +1,52 @@
+function setValue(name, value) 
+{
+ scriptWidget.setPName(name); 
+ scriptWidget.setPValue(value); 
+}
+
+function getValue(name)
+{
+  scriptWidget.setPName(name); 
+  return scriptWidget.PValue; 
+}
+
+function update()
+{
+  var n = scriptWidget.PName; 
+  var max = getValue("max");
+  var min = getValue("min");
+  var val = getValue("val");
+  scriptWidget.setPName(n);
+
+  var angle = (115 / (max - min) ) * ( val - min) ;
+  print("Max:" + max + " Min:" + min + " Val:" + val + " Angle:" + angle);
+  scriptWidget.pointer.resetTransform();
+  if (angle > 120 ) 
+     angle = 120; 
+  if (angle < -5 ) 
+     angle = -5; 
+
+  scriptWidget.pointer.rotate(125+angle);
+  scriptWidget.pointer.translate(-2.55,-2.55);
+}
+
+
+function init()
+{
+  print("Init ScriptWidget");
+  scriptWidget.addItem("widget"); 
+  scriptWidget.addItem("pointer"); 
+  scriptWidget.addItem("glass"); 
+  scriptWidget.loadSvgFile(":/temp_gauge.svg");
+  scriptWidget.glass.setPos(9.365,9.365);
+  scriptWidget.pointer.setPos(64.0,86.0);
+  scriptWidget.sceneRect = scriptWidget.widget.boundingRect;
+  setValue("min",0.0); 
+  setValue("max",40.0); 
+  setValue("val",0.0); 
+  scriptWidget["evaluate()"].connect(update);
+
+  update();
+}
+
+init();

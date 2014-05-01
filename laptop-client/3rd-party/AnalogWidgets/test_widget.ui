@@ -1,0 +1,683 @@
+<ui version="4.0" >
+ <class>widget</class>
+ <widget class="QWidget" name="widget" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>744</width>
+    <height>645</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>AnalogWidgets Palette</string>
+  </property>
+  <widget class="QGroupBox" name="groupBox_7" >
+   <property name="geometry" >
+    <rect>
+     <x>20</x>
+     <y>410</y>
+     <width>231</width>
+     <height>171</height>
+    </rect>
+   </property>
+   <property name="title" >
+    <string>ScriptWidget</string>
+   </property>
+   <layout class="QGridLayout" name="gridLayout_6" >
+    <item row="0" column="0" >
+     <widget class="ScriptWidget" name="scriptWidget" >
+      <property name="toolTip" >
+       <string/>
+      </property>
+      <property name="whatsThis" >
+       <string/>
+      </property>
+      <property name="script" >
+       <string>:/temp_gauge.qjs</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QSlider" name="horizontalSlider" >
+   <property name="geometry" >
+    <rect>
+     <x>270</x>
+     <y>430</y>
+     <width>121</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="maximum" >
+    <number>120</number>
+   </property>
+   <property name="orientation" >
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label" >
+   <property name="geometry" >
+    <rect>
+     <x>270</x>
+     <y>410</y>
+     <width>54</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Value</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="comboBox" >
+   <property name="geometry" >
+    <rect>
+     <x>270</x>
+     <y>480</y>
+     <width>76</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <item>
+    <property name="text" >
+     <string>val</string>
+    </property>
+   </item>
+   <item>
+    <property name="text" >
+     <string>max</string>
+    </property>
+   </item>
+   <item>
+    <property name="text" >
+     <string>min</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QLabel" name="label_2" >
+   <property name="geometry" >
+    <rect>
+     <x>30</x>
+     <y>10</y>
+     <width>691</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font" >
+    <font>
+     <pointsize>19</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text" >
+    <string>AnalogWidgets</string>
+   </property>
+   <property name="alignment" >
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QWidget" name="layoutWidget" >
+   <property name="geometry" >
+    <rect>
+     <x>20</x>
+     <y>50</y>
+     <width>701</width>
+     <height>241</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout" >
+    <item>
+     <widget class="QGroupBox" name="groupBox_3" >
+      <property name="title" >
+       <string>ThermoMeter</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_3" >
+       <item row="0" column="0" >
+        <widget class="ThermoMeter" name="thermometer" >
+         <property name="toolTip" >
+          <string>Shows the pressure</string>
+         </property>
+         <property name="whatsThis" >
+          <string>The bar meter widget displays the pressure attached to it</string>
+         </property>
+         <property name="maximum" >
+          <double>120.000000000000000</double>
+         </property>
+         <property name="critical" >
+          <double>80.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="groupBox_2" >
+      <property name="title" >
+       <string>ManoMeter</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_2" >
+       <item row="0" column="0" >
+        <widget class="ManoMeter" name="manometer" >
+         <property name="toolTip" >
+          <string>Shows the pressure</string>
+         </property>
+         <property name="whatsThis" >
+          <string>The bar meter widget displays the pressure attached to it</string>
+         </property>
+         <property name="maximum" >
+          <double>120.000000000000000</double>
+         </property>
+         <property name="nominal" >
+          <double>30.000000000000000</double>
+         </property>
+         <property name="critical" >
+          <double>80.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="groupBox" >
+      <property name="title" >
+       <string>WallClock</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout" >
+       <item row="0" column="0" >
+        <widget class="WallClock" name="wallclock" >
+         <property name="toolTip" >
+          <string>The current time and date</string>
+         </property>
+         <property name="whatsThis" >
+          <string>The analog clock widget displays the current time and date.</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="layoutWidget" >
+   <property name="geometry" >
+    <rect>
+     <x>20</x>
+     <y>300</y>
+     <width>701</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_2" >
+    <item>
+     <widget class="QGroupBox" name="groupBox_5" >
+      <property name="title" >
+       <string>Counter</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_5" >
+       <item row="0" column="0" >
+        <widget class="Counter" name="counter" >
+         <property name="toolTip" >
+          <string/>
+         </property>
+         <property name="whatsThis" >
+          <string/>
+         </property>
+         <property name="value" >
+          <number>1234567</number>
+         </property>
+         <property name="digits" >
+          <number>6</number>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="groupBox_4" >
+      <property name="title" >
+       <string>Led</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_4" >
+       <item row="0" column="0" >
+        <widget class="Led" name="led" >
+         <property name="toolTip" >
+          <string>Color Led component</string>
+         </property>
+         <property name="whatsThis" >
+          <string>Led indicator</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1" >
+        <widget class="Led" name="led_2" >
+         <property name="toolTip" >
+          <string>Color Led component</string>
+         </property>
+         <property name="whatsThis" >
+          <string>Led indicator</string>
+         </property>
+         <property name="color" >
+          <color>
+           <red>46</red>
+           <green>255</green>
+           <blue>0</blue>
+          </color>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2" >
+        <widget class="Led" name="led_3" >
+         <property name="toolTip" >
+          <string>Color Led component</string>
+         </property>
+         <property name="whatsThis" >
+          <string>Led indicator</string>
+         </property>
+         <property name="color" >
+          <color>
+           <red>255</red>
+           <green>244</green>
+           <blue>76</blue>
+          </color>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="3" >
+        <widget class="Led" name="led_4" >
+         <property name="toolTip" >
+          <string>Color Led component</string>
+         </property>
+         <property name="whatsThis" >
+          <string>Led indicator</string>
+         </property>
+         <property name="color" >
+          <color>
+           <red>8</red>
+           <green>0</green>
+           <blue>255</blue>
+          </color>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" >
+        <widget class="Led" name="led_8" >
+         <property name="toolTip" >
+          <string>Color Led component</string>
+         </property>
+         <property name="whatsThis" >
+          <string>Led indicator</string>
+         </property>
+         <property name="checked" >
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1" >
+        <widget class="Led" name="led_6" >
+         <property name="toolTip" >
+          <string>Color Led component</string>
+         </property>
+         <property name="whatsThis" >
+          <string>Led indicator</string>
+         </property>
+         <property name="checked" >
+          <bool>false</bool>
+         </property>
+         <property name="color" >
+          <color>
+           <red>46</red>
+           <green>255</green>
+           <blue>0</blue>
+          </color>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2" >
+        <widget class="Led" name="led_5" >
+         <property name="toolTip" >
+          <string>Color Led component</string>
+         </property>
+         <property name="whatsThis" >
+          <string>Led indicator</string>
+         </property>
+         <property name="checked" >
+          <bool>false</bool>
+         </property>
+         <property name="color" >
+          <color>
+           <red>255</red>
+           <green>244</green>
+           <blue>76</blue>
+          </color>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="3" >
+        <widget class="Led" name="led_7" >
+         <property name="toolTip" >
+          <string>Color Led component</string>
+         </property>
+         <property name="whatsThis" >
+          <string>Led indicator</string>
+         </property>
+         <property name="checked" >
+          <bool>false</bool>
+         </property>
+         <property name="color" >
+          <color>
+           <red>8</red>
+           <green>0</green>
+           <blue>255</blue>
+          </color>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="groupBox_6" >
+      <property name="title" >
+       <string>BitmapButton</string>
+      </property>
+      <widget class="BitmapButton" name="wallclock_3" >
+       <property name="geometry" >
+        <rect>
+         <x>90</x>
+         <y>20</y>
+         <width>64</width>
+         <height>61</height>
+        </rect>
+       </property>
+       <property name="toolTip" >
+        <string/>
+       </property>
+       <property name="whatsThis" >
+        <string/>
+       </property>
+       <property name="icon" >
+        <iconset resource="resources/resources.qrc" >
+         <normaloff>:/spce_black.svg</normaloff>:/spce_black.svg</iconset>
+       </property>
+       <property name="checkable" >
+        <bool>true</bool>
+       </property>
+       <property name="checked" >
+        <bool>true</bool>
+       </property>
+       <property name="downIcon" >
+        <iconset resource="resources/resources.qrc" >
+         <normaloff>:/spce_blue.svg</normaloff>:/spce_blue.svg</iconset>
+       </property>
+      </widget>
+      <widget class="BitmapButton" name="wallclock_2" >
+       <property name="geometry" >
+        <rect>
+         <x>10</x>
+         <y>20</y>
+         <width>64</width>
+         <height>64</height>
+        </rect>
+       </property>
+       <property name="minimumSize" >
+        <size>
+         <width>64</width>
+         <height>64</height>
+        </size>
+       </property>
+       <property name="maximumSize" >
+        <size>
+         <width>64</width>
+         <height>64</height>
+        </size>
+       </property>
+       <property name="toolTip" >
+        <string/>
+       </property>
+       <property name="whatsThis" >
+        <string/>
+       </property>
+       <property name="icon" >
+        <iconset resource="resources/resources.qrc" >
+         <normaloff>:/spce_black.svg</normaloff>:/spce_black.svg</iconset>
+       </property>
+       <property name="downIcon" >
+        <iconset resource="resources/resources.qrc" >
+         <normaloff>:/spce_blue.svg</normaloff>:/spce_blue.svg</iconset>
+       </property>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_8" >
+   <property name="geometry" >
+    <rect>
+     <x>470</x>
+     <y>420</y>
+     <width>241</width>
+     <height>211</height>
+    </rect>
+   </property>
+   <property name="title" >
+    <string>PotentioMeter</string>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout" >
+    <item>
+     <widget class="PotentioMeter" name="dial" >
+      <property name="toolTip" >
+       <string/>
+      </property>
+      <property name="whatsThis" >
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QComboBox" name="comboBox_2" >
+      <item>
+       <property name="text" >
+        <string>:/default/resources/dial1.svg</string>
+       </property>
+      </item>
+      <item>
+       <property name="text" >
+        <string>:/default/resources/dial2.svg</string>
+       </property>
+      </item>
+      <item>
+       <property name="text" >
+        <string>:/default/resources/dial3.svg</string>
+       </property>
+      </item>
+      <item>
+       <property name="text" >
+        <string>:/default/resources/dial4.svg</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>WallClock</class>
+   <extends>QWidget</extends>
+   <header>analogwidgets/wallclock.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ManoMeter</class>
+   <extends>QWidget</extends>
+   <header>analogwidgets/manometer.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ThermoMeter</class>
+   <extends>QWidget</extends>
+   <header>analogwidgets/thermometer.h</header>
+  </customwidget>
+  <customwidget>
+   <class>Led</class>
+   <extends>QWidget</extends>
+   <header>analogwidgets/led.h</header>
+  </customwidget>
+  <customwidget>
+   <class>PotentioMeter</class>
+   <extends>QWidget</extends>
+   <header>analogwidgets/potentiometer.h</header>
+  </customwidget>
+  <customwidget>
+   <class>Counter</class>
+   <extends>QWidget</extends>
+   <header>analogwidgets/counter.h</header>
+  </customwidget>
+  <customwidget>
+   <class>BitmapButton</class>
+   <extends>QWidget</extends>
+   <header>analogwidgets/bitmapbutton.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ScriptWidget</class>
+   <extends>QGraphicsView</extends>
+   <header>analogwidgets/scriptwidget.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="resources/resources.qrc" />
+ </resources>
+ <connections>
+  <connection>
+   <sender>horizontalSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>counter</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>290</x>
+     <y>394</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>208</x>
+     <y>330</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>horizontalSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>manometer</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>356</x>
+     <y>398</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>369</x>
+     <y>215</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>horizontalSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>thermometer</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>338</x>
+     <y>393</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>129</x>
+     <y>131</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>horizontalSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>scriptWidget</receiver>
+   <slot>setPValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>298</x>
+     <y>391</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>173</x>
+     <y>442</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>comboBox</sender>
+   <signal>highlighted(QString)</signal>
+   <receiver>scriptWidget</receiver>
+   <slot>setPName(QString)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>305</x>
+     <y>456</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>226</x>
+     <y>495</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>comboBox_2</sender>
+   <signal>currentIndexChanged(QString)</signal>
+   <receiver>dial</receiver>
+   <slot>setSvgResourceFile(QString)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>491</x>
+     <y>604</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>522</x>
+     <y>557</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>dial</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>horizontalSlider</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>485</x>
+     <y>482</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>387</x>
+     <y>441</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>horizontalSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>dial</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>362</x>
+     <y>439</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>472</x>
+     <y>440</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

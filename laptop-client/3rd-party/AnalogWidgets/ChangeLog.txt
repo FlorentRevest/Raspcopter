@@ -1,0 +1,26 @@
+2009-04-23 rev. 229 
+Added new resources in resources/widgets/dials/dials.svg 
+Plans are to make those widgets alive and create bigger library of widgets based on 
+svg themes. 
+
+2008-11-26 rev. 224
+Added make install for linux - any comments and/or  bugfixes for other systems 
+warmly welcomed. 
+Added PotentioMeter with 4 predefined svg themes. 
+PotentioMeter is still expermimental so use it with caution.
+Added alternative theme for Counter in test program. 
+More info about themes in potentiometer.h and counter.h 
+
+2008-11-05 rev 217 
+Fixed all remaining and founded references where end iterator was used. What
+caused crash with MsVisual. 
+
+2008-11-03 rev 215. 
+Fixed last error in poprper way - shame to say but I screw up 
+Valentin fix. 
+
+2008-10-29 rev. 214 
+Fixed ScaleGridDecorator::paintYScale() MsVisual crash. 
+Thanks Valentin ;). 
+
+

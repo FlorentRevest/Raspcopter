@@ -1,0 +1,21 @@
+<RCC>
+    <qresource prefix="/test">
+        <file>resources/volume.svg</file>
+        <file>resources/digits.svg</file>
+        <file>wtr/02-12-17_102646.wtr</file>
+        <file>wtr/02-12-17_102706.wtr</file>
+        <file>wtr/02-12-17_102727.wtr</file>
+        <file>wtr/02-12-17_102747.wtr</file>
+        <file>wtr/02-12-17_102808.wtr</file>
+        <file>wtr/02-12-17_102828.wtr</file>
+        <file>wtr/02-12-17_102849.wtr</file>
+        <file>wtr/02-12-17_102945.wtr</file>
+        <file>wtr/02-12-17_103005.wtr</file>
+        <file>wtr/02-12-17_103026.wtr</file>
+        <file>wtr/02-12-17_103046.wtr</file>
+        <file>wtr/02-12-17_103107.wtr</file>
+        <file>wtr/02-12-17_103127.wtr</file>
+        <file>wtr/02-12-17_103148.wtr</file>
+        <file>wtr/02-12-17_103208.wtr</file>
+    </qresource>
+</RCC>

@@ -1,0 +1,11 @@
+My list of wishes, to make some thinks more usable
+ 
+- Write some documentation, or ask somebody to do it and help him ;) 
+- Explain design patterns and how to extend Chart widget by new decorators.
+  Encourage pepole to write new decorators ;)
+
+List of things I really plan to do: 
+- Use shared_ptr in char::Channel for storing data. Now you have to delete it
+  manually. 
+
+ 
