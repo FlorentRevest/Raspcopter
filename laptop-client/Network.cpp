@@ -67,7 +67,6 @@ void *Network::readThread(void *context)
             switch (event.type) {
             case ENET_EVENT_TYPE_CONNECT:
                 server = event.peer;
-                printf("YEAH\n");
                 emit instance->connected();
                 break;
             case ENET_EVENT_TYPE_RECEIVE:

@@ -73,7 +73,7 @@ MainWindow::~MainWindow()
     delete m_network;
 }
 
-void MainWindow::setMeasuredValues(float roll, float pitch, float yaw)
+void MainWindow::setMeasuredValues(float yaw, float pitch, float roll)
 {
     ui->attitude_widget->setRoll(roll);
     ui->roll_measured->setValue(roll);
