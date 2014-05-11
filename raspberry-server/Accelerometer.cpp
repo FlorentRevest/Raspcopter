@@ -162,6 +162,9 @@ Accelerometer::Accelerometer()
         abort();
 
     setDMPEnabled(true);
+    zeroValues[0] = 0;
+    zeroValues[1] = 0;
+    zeroValues[2] = 0;
 }
 
 Accelerometer::~Accelerometer()
@@ -206,8 +209,9 @@ uint8_t Accelerometer::getGravity(VectorFloat *v, Quaternion *q)
 uint8_t Accelerometer::getYawPitchRoll(float *data, Quaternion *q, VectorFloat *gravity)
 {
     data[0] = atan2(2*q -> x*q -> y - 2*q -> w*q -> z, 2*q -> w*q -> w + 2*q -> x*q -> x - 1);
-    data[1] = atan(gravity -> x / sqrt(gravity -> y*gravity -> y + gravity -> z*gravity -> z));
-    data[2] = atan(gravity -> y / sqrt(gravity -> x*gravity -> x + gravity -> z*gravity -> z));
+    // !WARNING!: Pitch and Roll are reversed on my quadcopter
+    data[2] = atan(gravity -> x / sqrt(gravity -> y*gravity -> y + gravity -> z*gravity -> z));
+    data[1] = atan(gravity -> y / sqrt(gravity -> x*gravity -> x + gravity -> z*gravity -> z));
     return 0;
 }
 
@@ -222,7 +226,22 @@ uint8_t Accelerometer::getYawPitchRoll(float *data)
     getQuaternion(&q, fifoBuffer);
     getGravity(&gravity, &q);
     getYawPitchRoll(data, &q, &gravity);
+    data[0] = (data[0] * 180/M_PI) - zeroValues[0];
+    data[1] = (data[1] * 180/M_PI) - zeroValues[1];
+    data[2] = (data[2] * 180/M_PI) - zeroValues[2];
     return 0;
+}
+
+void Accelerometer::bypassDrift()
+{
+    sleep(20);
+    resetFIFO();
+    while(getFIFOCount() < 42);
+    float calibratedValues[3];
+    getYawPitchRoll(calibratedValues);
+    zeroValues[0] = calibratedValues[0];
+    zeroValues[1] = calibratedValues[1];
+    zeroValues[2] = calibratedValues[2];
 }
 
 uint16_t Accelerometer::getFIFOPacketSize()
@@ -435,14 +454,17 @@ int8_t Accelerometer::i2cReadBytes(uint8_t regAddr, uint8_t length, uint8_t *dat
     int8_t count = 0;
     if (write(m_i2cfd, &regAddr, 1) != 1) {
         fprintf(stderr, "Failed to write reg: %s\n", strerror(errno));
+        abort();
         return(-1);
     }
     count = read(m_i2cfd, data, length);
     if (count < 0) {
         fprintf(stderr, "Failed to read device(%d): %s\n", count, ::strerror(errno));
+        abort();
         return(-1);
     } else if (count != length) {
         fprintf(stderr, "Short read  from device, expected %d, got %d\n", length, count);
+        abort();
         return(-1);
     }
 
@@ -470,6 +492,7 @@ bool Accelerometer::i2cWriteBytes(uint8_t regAddr, uint8_t length, uint8_t* data
 
     if (length > 127) {
         fprintf(stderr, "Byte write count (%d) > 127\n", length);
+        abort();
         return(false);
     }
 
@@ -478,9 +501,11 @@ bool Accelerometer::i2cWriteBytes(uint8_t regAddr, uint8_t length, uint8_t* data
     count = write(m_i2cfd, buf, length+1);
     if (count < 0) {
         fprintf(stderr, "Failed to write device(%d): %s\n", count, ::strerror(errno));
+        abort();
         return(false);
     } else if (count != length+1) {
         fprintf(stderr, "Short write to device, expected %d, got %d\n", length+1, count);
+        abort();
         return(false);
     }
 

@@ -149,6 +149,7 @@ public:
     uint8_t getGravity(VectorFloat *v, Quaternion *q);
     uint8_t getYawPitchRoll(float *data, Quaternion *q, VectorFloat *gravity);
     uint8_t getYawPitchRoll(float *data);
+    void bypassDrift();
 
     void setRate(uint8_t rate);
     uint8_t getIntStatus();
@@ -174,6 +175,7 @@ private:
     uint8_t *dmpPacketBuffer;
     uint16_t dmpPacketSize;
     uint8_t buffer[14];
+    float zeroValues[3];
     int m_i2cfd;
 };
 

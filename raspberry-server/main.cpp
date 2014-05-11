@@ -25,7 +25,6 @@
 #include "Logger.h"
 #include "Network.h"
 
-// TODO: Calibrate the horizontal values with 6 seconds mesurements
 // TODO: Logger class
 // TODO: Signals handler
 
@@ -36,23 +35,22 @@ int main()
 {
     Network network;
     Accelerometer mpu;
+    mpu.bypassDrift();
     Motors motors;
     motors.setToZero();
 
+    float ypr[3];
     while(true) {
         if(mpu.getFIFOCount() > 42) {
-            float ypr[3];
             mpu.getYawPitchRoll(ypr);
 
+            float p_computed = p_pid.compute(ypr[1], p_target), r_computed = r_pid.compute(ypr[2], r_target);
+            motors.setSpeed(MOTOR_FL, throttle + r_computed - p_computed);
+            motors.setSpeed(MOTOR_BL, throttle + r_computed + p_computed);
+            motors.setSpeed(MOTOR_FR, throttle - r_computed - p_computed);
+            motors.setSpeed(MOTOR_BR, throttle - r_computed + p_computed);
+
             network.send(SET_MEASURED_VALUES, ypr, sizeof(float)*3, false);
-
-            float /*y = ypr[0] * 180/M_PI,*/ p  = ypr[1] * 180/M_PI, r = ypr[2] * 180/M_PI;
-            float /*y_computed = y_pid.compute(y, y_target),*/ p_computed = p_pid.compute(p, p_target), r_computed = r_pid.compute(r, r_target);
-
-            motors.setSpeed(MOTOR_FL, throttle + p_computed - r_computed); // Note: Pitch and Roll are reversed on my quadcopter it's my fault
-            motors.setSpeed(MOTOR_BL, throttle + p_computed + r_computed);
-            motors.setSpeed(MOTOR_FR, throttle - p_computed - r_computed);
-            motors.setSpeed(MOTOR_BR, throttle - p_computed + r_computed);
         }
     } 
 
