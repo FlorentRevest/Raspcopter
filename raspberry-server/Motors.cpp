@@ -50,7 +50,7 @@ unsigned short Motors::getSpeed(unsigned char channel)
 
 void Motors::setSpeed(unsigned char channel, unsigned short target)
 {
-    libusb_control_transfer(device_handle, 0x40, 0x85, 1225 + target*4, channel, 0, 0, (ushort)5000);
+    libusb_control_transfer(device_handle, 0x40, 0x85, 1225 + target, channel, 0, 0, (ushort)5000);
     speeds[channel] = target;
 }
 
