@@ -50,6 +50,7 @@ private:
     static ENetHost *server;
 
     pthread_t thread;
+    static pthread_mutex_t net_mutex;
 };
 
 #endif // _NETWORK_H

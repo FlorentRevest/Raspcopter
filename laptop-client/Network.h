@@ -53,6 +53,7 @@ private:
     static ENetHost *client;
     static ENetPeer *server;
     pthread_t thread;
+    static pthread_mutex_t net_mutex;
     char *m_ip;
 
 signals:

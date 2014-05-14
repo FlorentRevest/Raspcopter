@@ -21,6 +21,7 @@
 
 ENetHost *Network::client = NULL;
 ENetPeer *Network::server = NULL;
+pthread_mutex_t Network::net_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 struct thread_args {
     char *ip;
@@ -59,55 +60,58 @@ void *Network::readThread(void *context)
 
     if (!(enet_host_service (client, &event, 5000) > 0 && event.type == ENET_EVENT_TYPE_CONNECT))
         return (void*)3;
+    emit instance->connected();
 
     while(true) {
-        serviceResult = 1;
-        while(serviceResult > 0) {
-            serviceResult = enet_host_service (client, &event, 1000);
-            switch (event.type) {
-            case ENET_EVENT_TYPE_CONNECT:
-                server = event.peer;
-                emit instance->connected();
+        pthread_mutex_lock(&net_mutex);
+        enet_host_service (client, &event, 0);
+        pthread_mutex_unlock(&net_mutex);
+        switch (event.type) {
+        case ENET_EVENT_TYPE_CONNECT:
+            server = event.peer;
+            emit instance->connected();
+            break;
+        case ENET_EVENT_TYPE_RECEIVE:
+            switch(event.packet->data[0]) {
+            case SET_MEASURED_VALUES:
+                float values[3];
+                memcpy(values, event.packet->data + 1, sizeof(float) * 3);
+                emit instance->setMeasuredValues(values[0], values[1], values[2]);
                 break;
-            case ENET_EVENT_TYPE_RECEIVE:
-                switch(event.packet->data[0]) {
-                case SET_MEASURED_VALUES:
-                    float values[3];
-                    memcpy(values, event.packet->data + 1, sizeof(float) * 3);
-                    emit instance->setMeasuredValues(values[0], values[1], values[2]);
-                    break;
-                case SET_CPU_USAGE:
-                    emit instance->setCPUUsage(event.packet->data[1]);
-                    break;
-                case SET_MEMORY_USAGE:
-                    emit instance->setMemoryUsage(event.packet->data[1]);
-                    break;
-                }
-                enet_packet_destroy(event.packet);
+            case SET_CPU_USAGE:
+                emit instance->setCPUUsage(event.packet->data[1]);
                 break;
-            case ENET_EVENT_TYPE_DISCONNECT:
-                server = NULL;
-                emit instance->disconnect();
-                break;
-            default:
+            case SET_MEMORY_USAGE:
+                emit instance->setMemoryUsage(event.packet->data[1]);
                 break;
             }
+            enet_packet_destroy(event.packet);
+            break;
+        case ENET_EVENT_TYPE_DISCONNECT:
+            server = NULL;
+            emit instance->disconnect();
+            break;
+        default:
+            break;
         }
+        usleep(100);
     }
     return (void*)0;
 }
 
 void Network::send(char opcode, const void *data, size_t dataLength, bool reliable)
 {
-    if(client) {
-        char* ptr = new char[dataLength+1]();
-        ptr[0] = opcode;
-        memcpy(ptr+1, data, dataLength);
+    char* ptr = new char[dataLength+1]();
+    ptr[0] = opcode;
+    memcpy(ptr+1, data, dataLength);
+    ENetPacket * packet = enet_packet_create (ptr, dataLength + 1, (reliable) ? ENET_PACKET_FLAG_RELIABLE : ENET_PACKET_FLAG_UNRELIABLE_FRAGMENT);
 
-        ENetPacket * packet = enet_packet_create (ptr, dataLength + 1, (reliable) ? ENET_PACKET_FLAG_RELIABLE : ENET_PACKET_FLAG_UNRELIABLE_FRAGMENT);
+    pthread_mutex_lock(&net_mutex);
+    if(client) {
         enet_peer_send(server, 0, packet);
         enet_host_flush(client);
     }
+    pthread_mutex_unlock(&net_mutex);
 }
 
 Network::~Network()
