@@ -18,6 +18,7 @@
  * ================================================================== */
 
 #include <cstdint>
+#include <csignal>
 
 #include "Accelerometer.h"
 #include "PID.h"
@@ -26,8 +27,8 @@
 #include "Network.h"
 
 // TODO: Logger class
-// TODO: Signals handler
 
+void sigHandler(int sig);
 PID y_pid(2,0,0), p_pid(2,0,0), r_pid(2,0,0);
 float y_target = 0, p_target = 0, r_target = 0, throttle = 0;
 
@@ -38,6 +39,12 @@ int main()
     mpu.bypassDrift();
     Motors motors;
     motors.setToZero();
+
+    signal(SIGABRT, sigHandler);
+    signal(SIGINT, sigHandler);
+    signal(SIGKILL, sigHandler);
+    signal(SIGQUIT, sigHandler);
+    signal(SIGTERM, sigHandler);
 
     float ypr[3];
     while(true) {
@@ -51,9 +58,17 @@ int main()
             motors.setSpeed(MOTOR_BR, throttle - r_computed + p_computed);
 
             network.send(SET_MEASURED_VALUES, ypr, sizeof(float)*3, false);
+
+//            usleep(5);
         }
     } 
 
     exit(EXIT_SUCCESS);
+}
+
+void sigHandler(int sig)
+{
+    std::cout << "[ERROR] Received signal " << sig << std::endl;
+    exit(sig);
 }
 
