@@ -107,16 +107,16 @@
                      <string>The bar meter widget displays the pressure attached to it</string>
                     </property>
                     <property name="minimum">
-                     <double>-100.000000000000000</double>
+                     <double>-60.000000000000000</double>
                     </property>
                     <property name="maximum">
-                     <double>100.000000000000000</double>
+                     <double>60.000000000000000</double>
                     </property>
                     <property name="nominal">
-                     <double>-80.000000000000000</double>
+                     <double>-50.000000000000000</double>
                     </property>
                     <property name="critical">
-                     <double>80.000000000000000</double>
+                     <double>50.000000000000000</double>
                     </property>
                     <property name="prefix">
                      <string>Pitch </string>
@@ -147,16 +147,16 @@
                      <string>The bar meter widget displays the pressure attached to it</string>
                     </property>
                     <property name="minimum">
-                     <double>-100.000000000000000</double>
+                     <double>-60.000000000000000</double>
                     </property>
                     <property name="maximum">
-                     <double>100.000000000000000</double>
+                     <double>60.000000000000000</double>
                     </property>
                     <property name="nominal">
-                     <double>-80.000000000000000</double>
+                     <double>-50.000000000000000</double>
                     </property>
                     <property name="critical">
-                     <double>80.000000000000000</double>
+                     <double>50.000000000000000</double>
                     </property>
                     <property name="prefix">
                      <string>Yaw </string>
@@ -193,16 +193,16 @@
                      <string>The bar meter widget displays the pressure attached to it</string>
                     </property>
                     <property name="minimum">
-                     <double>-100.000000000000000</double>
+                     <double>-60.000000000000000</double>
                     </property>
                     <property name="maximum">
-                     <double>100.000000000000000</double>
+                     <double>60.000000000000000</double>
                     </property>
                     <property name="nominal">
-                     <double>-80.000000000000000</double>
+                     <double>-50.000000000000000</double>
                     </property>
                     <property name="critical">
-                     <double>80.000000000000000</double>
+                     <double>50.000000000000000</double>
                     </property>
                     <property name="prefix">
                      <string>Pitch </string>
@@ -279,16 +279,16 @@
                      <string>The bar meter widget displays the pressure attached to it</string>
                     </property>
                     <property name="minimum">
-                     <double>-100.000000000000000</double>
+                     <double>-60.000000000000000</double>
                     </property>
                     <property name="maximum">
-                     <double>100.000000000000000</double>
+                     <double>60.000000000000000</double>
                     </property>
                     <property name="nominal">
-                     <double>-80.000000000000000</double>
+                     <double>-50.000000000000000</double>
                     </property>
                     <property name="critical">
-                     <double>80.000000000000000</double>
+                     <double>50.000000000000000</double>
                     </property>
                     <property name="prefix">
                      <string>Roll </string>
@@ -325,16 +325,16 @@
                      <string>The bar meter widget displays the pressure attached to it</string>
                     </property>
                     <property name="minimum">
-                     <double>-100.000000000000000</double>
+                     <double>-60.000000000000000</double>
                     </property>
                     <property name="maximum">
-                     <double>100.000000000000000</double>
+                     <double>60.000000000000000</double>
                     </property>
                     <property name="nominal">
-                     <double>-80.000000000000000</double>
+                     <double>-50.000000000000000</double>
                     </property>
                     <property name="critical">
-                     <double>80.000000000000000</double>
+                     <double>50.000000000000000</double>
                     </property>
                     <property name="prefix">
                      <string>Yaw </string>
@@ -371,16 +371,16 @@
                      <string>The bar meter widget displays the pressure attached to it</string>
                     </property>
                     <property name="minimum">
-                     <double>-100.000000000000000</double>
+                     <double>-60.000000000000000</double>
                     </property>
                     <property name="maximum">
-                     <double>100.000000000000000</double>
+                     <double>60.000000000000000</double>
                     </property>
                     <property name="nominal">
-                     <double>-80.000000000000000</double>
+                     <double>-50.000000000000000</double>
                     </property>
                     <property name="critical">
-                     <double>80.000000000000000</double>
+                     <double>50.000000000000000</double>
                     </property>
                     <property name="prefix">
                      <string>Roll </string>

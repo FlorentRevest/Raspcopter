@@ -42,6 +42,9 @@ MainWindow::MainWindow(Joystick *joystick, Network* network) : QMainWindow(), ui
     m_plot->graph(2)->setPen(QPen(Qt::green));
     m_plot->graph(2)->setName("Yaw");
 
+    m_plot->yAxis->setRangeLower(-20);
+    m_plot->yAxis->setRangeUpper(20);
+
     m_plot->xAxis->setTickLabelType(QCPAxis::ltDateTime);
     m_plot->xAxis->setDateTimeFormat("hh:mm:ss");
     m_plot->xAxis->setAutoTickStep(false);
@@ -90,8 +93,8 @@ void MainWindow::setMeasuredValues(float yaw, float pitch, float roll)
         m_plot->graph(1)->addData(key, pitch);
         m_plot->graph(2)->addData(key, yaw);
 
-        m_plot->graph(0)->rescaleValueAxis();
-        m_plot->graph(1)->rescaleValueAxis();
+        m_plot->graph(0)->rescaleValueAxis(true);
+        m_plot->graph(1)->rescaleValueAxis(true);
         m_plot->graph(2)->rescaleValueAxis(true);
         lastPointKey = key;
     }
@@ -155,27 +158,27 @@ void MainWindow::updateJoystick()
             float data = 0;
             switch(event.number) {
             case 0:
-                ui->roll_joystick->setValue(event.value*100/32767);
-                data = (float)(event.value*100/32767);
+                ui->roll_joystick->setValue(event.value*40/32767);
+                data = (float)(event.value*40/32767);
                 m_network->send(SET_WANTED_ROLL, &data, sizeof(float), false);
                 ui->attitude_widget->setWantedRoll(data);
                 ui->attitude_widget->repaint();
                 break;
             case 1:
-                ui->pitch_joystick->setValue(event.value*100/32767);
-                data = (float)(event.value*100/32767);
+                ui->pitch_joystick->setValue(event.value*40/32767);
+                data = (float)(event.value*40/32767);
                 m_network->send(SET_WANTED_PITCH, &data, sizeof(float), false);
                 ui->attitude_widget->setWantedPitch(data);
                 ui->attitude_widget->repaint();
                 break;
             case 3:
                 ui->throttle_joystick->setValue((event.value+32767)*50/32767);
-                data = (float)((event.value+32767)*50/32767);
+                data = (float)((event.value+32767)*1500/32767);
                 m_network->send(SET_WANTED_THROTTLE, &data, sizeof(float), false);
                 break;
             case 4:
-                ui->yaw_joystick->setValue(event.value*100/32767);
-                data = (float)(event.value*100/32767);
+                ui->yaw_joystick->setValue(event.value*40/32767);
+                data = (float)(event.value*40/32767);
                 m_network->send(SET_WANTED_YAW, &data, sizeof(float), false);
                 break;
             }

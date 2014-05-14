@@ -26,6 +26,7 @@ void AttitudeWidget::setWantedPitch(int pitch)
 {
     m_wantedPitch = pitch;
 }
+
 void AttitudeWidget::paintEvent(QPaintEvent *)
 {
     QPainter painter;
