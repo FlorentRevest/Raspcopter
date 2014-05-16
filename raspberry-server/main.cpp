@@ -31,13 +31,13 @@
 void sigHandler(int sig);
 PID y_pid(2,0,0), p_pid(2,0,0), r_pid(2,0,0);
 float y_target = 0, p_target = 0, r_target = 0, throttle = 0;
+Motors motors;
 
 int main()
 {
     Network network;
-    Accelerometer mpu;
-    mpu.bypassDrift();
-    Motors motors;
+    Accelerometer imu;
+    imu.bypassDrift();
     motors.setToZero();
 
     signal(SIGABRT, sigHandler);
@@ -48,8 +48,8 @@ int main()
 
     float ypr[3];
     while(true) {
-        if(mpu.getFIFOCount() > 42) {
-            mpu.getYawPitchRoll(ypr);
+        if(imu.getFIFOCount() > 42) {
+            imu.getYawPitchRoll(ypr);
 
             float p_computed = p_pid.compute(ypr[1], p_target), r_computed = r_pid.compute(ypr[2], r_target);
             motors.setSpeed(MOTOR_FL, throttle + r_computed - p_computed);
@@ -58,8 +58,6 @@ int main()
             motors.setSpeed(MOTOR_BR, throttle - r_computed + p_computed);
 
             network.send(SET_MEASURED_VALUES, ypr, sizeof(float)*3, false);
-
-//            usleep(5);
         }
     } 
 
@@ -69,6 +67,7 @@ int main()
 void sigHandler(int sig)
 {
     std::cout << "[ERROR] Received signal " << sig << std::endl;
+    motors.setToZero();
     exit(sig);
 }
 
