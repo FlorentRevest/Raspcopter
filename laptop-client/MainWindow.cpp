@@ -5,6 +5,7 @@ MainWindow::MainWindow(Joystick *joystick, Network* network) : QMainWindow(), ui
 {
     ui->setupUi(this);
 
+    network->start();
     connect(network, SIGNAL(connected()), this, SLOT(networkConnected()));
     connect(network, SIGNAL(disconnected()), this, SLOT(networkDisconnected()));
 
@@ -15,10 +16,19 @@ MainWindow::MainWindow(Joystick *joystick, Network* network) : QMainWindow(), ui
     // Corner widgets
     QWidget *cornerWidget = new QWidget();
     QHBoxLayout *cornerLayout = new QHBoxLayout();
+    m_startServer = new QPushButton("Start Server");
+    connect(m_startServer, SIGNAL(clicked()), this, SLOT(startServer()));
+    m_stopServer = new QPushButton("Stop Server");
+    connect(m_stopServer, SIGNAL(clicked()), this, SLOT(stopServer()));
+    m_reconnect = new QPushButton("Reconnect");
+    connect(m_reconnect, SIGNAL(clicked()), this, SLOT(reconnect()));
     m_ipLabel = new QLabel();
     m_ipLabel->setText(m_network->ip());
     m_led = new Led();
     m_led->setMinimumWidth(20);
+    cornerLayout->addWidget(m_startServer);
+    cornerLayout->addWidget(m_stopServer);
+    cornerLayout->addWidget(m_reconnect);
     cornerLayout->addWidget(m_led);
     cornerLayout->addWidget(m_ipLabel);
     cornerLayout->setMargin(0);
@@ -86,6 +96,8 @@ void MainWindow::setMeasuredValues(float yaw, float pitch, float roll)
 
     ui->yaw_measured->setValue(yaw);
 
+    ui->attitude_widget->repaint();
+
     double key = QDateTime::currentDateTime().toMSecsSinceEpoch()/1000.0;
     static double lastPointKey = 0;
     if (key-lastPointKey > 0.02) {
@@ -110,6 +122,23 @@ void MainWindow::setCPUUsage(char usage)
 void MainWindow::setMemoryUsage(char usage)
 {
     ui->cpu_label->setText(QString::number(usage).append(" %"));
+}
+
+void MainWindow::startServer()
+{
+    system("ssh raspberry-pi 'if ! [ \"$(pidof server)\" ]; then ./server; fi' &");
+}
+
+void MainWindow::stopServer()
+{
+    system("ssh raspberry-pi 'if [ \"$(pidof server)\" ]; then killall -v server; fi' &");
+    networkDisconnected();
+}
+
+void MainWindow::reconnect()
+{
+    networkDisconnected();
+    m_network->restart();
 }
 
 void MainWindow::networkDisconnected()
@@ -173,7 +202,7 @@ void MainWindow::updateJoystick()
                 break;
             case 3:
                 ui->throttle_joystick->setValue((event.value+32767)*50/32767);
-                data = (float)((event.value+32767)*1500/32767);
+                data = (float)((event.value+32767)*2000/32767);
                 m_network->send(SET_WANTED_THROTTLE, &data, sizeof(float), false);
                 break;
             case 4:

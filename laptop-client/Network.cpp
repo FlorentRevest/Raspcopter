@@ -33,10 +33,9 @@ Network::Network(char *ip) : QObject()
     m_ip = ip;
     if(enet_initialize() != 0)
         exit(EXIT_FAILURE);
-    struct thread_args *args = new struct thread_args;
+    args = new struct thread_args;
     args->ip = ip;
     args->instance = this;
-    pthread_create(&thread, NULL, &readThread, (void *)args);
 }
 
 void *Network::readThread(void *context)
@@ -44,7 +43,6 @@ void *Network::readThread(void *context)
     struct thread_args *args = (struct thread_args *)context;
     char *ip = args->ip;
     Network *instance = args->instance;
-    int serviceResult = 1;
     ENetEvent event;
     ENetAddress address;
 
@@ -112,6 +110,27 @@ void Network::send(char opcode, const void *data, size_t dataLength, bool reliab
         enet_host_flush(client);
     }
     pthread_mutex_unlock(&net_mutex);
+}
+
+void Network::start()
+{
+    pthread_create(&thread, NULL, &readThread, (void *)args);
+}
+
+void Network::restart()
+{
+    pthread_mutex_lock(&net_mutex);
+    ENetEvent event;
+    enet_peer_disconnect(server, 0);
+    while (enet_host_service (client, &event, 3000) > 0) {
+        if(event.type == ENET_EVENT_TYPE_RECEIVE)
+            enet_packet_destroy (event.packet);
+        else if(event.type == ENET_EVENT_TYPE_DISCONNECT)
+            break;
+    }
+    enet_host_destroy(client);
+    pthread_mutex_unlock(&net_mutex);
+    start();
 }
 
 Network::~Network()

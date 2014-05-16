@@ -39,6 +39,8 @@
 #define SET_CPU_USAGE       0x06
 #define SET_MEMORY_USAGE    0x07
 
+struct thread_args;
+
 class Network : public QObject
 {
     Q_OBJECT
@@ -48,10 +50,13 @@ public:
     static void *readThread(void *context);
     void send(char opcode, const void *data, size_t dataLength, bool reliable);
     char *ip();
+    void start();
+    void restart();
 
 private:
     static ENetHost *client;
     static ENetPeer *server;
+    struct thread_args *args;
     pthread_t thread;
     static pthread_mutex_t net_mutex;
     char *m_ip;

@@ -38,6 +38,7 @@ private:
     Led *m_led;
     QLabel *m_ipLabel;
     QCustomPlot *m_plot;
+    QPushButton *m_startServer, *m_stopServer, *m_reconnect;
 
 public slots:
     void updateJoystick();
@@ -51,6 +52,10 @@ public slots:
 
     void networkDisconnected();
     void networkConnected();
+
+    void startServer();
+    void stopServer();
+    void reconnect();
 };
 
 #endif // MAINWINDOW_H
