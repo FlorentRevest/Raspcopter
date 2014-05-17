@@ -1,3 +1,22 @@
+/* ====================================================================
+ * This file is part of Raspcopter.
+ *
+ * Copyright (C) 2014 - Florent Revest <florent.revest666@gmail.com>
+
+ * Raspcopter is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Raspcopter is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Raspcopter.  If not, see <http://www.gnu.org/licenses/>.
+ * ================================================================== */
+
 #include "MainWindow.h"
 #include "ui_mainwindow.h"
 
@@ -37,8 +56,8 @@ MainWindow::MainWindow(Joystick *joystick, Network* network) : QMainWindow(), ui
 
     // Instruments tab
     m_plot = ui->plot;
-    m_plot->setInteractions(QCP::iRangeZoom);
     m_plot->legend->setVisible(true);
+    m_plot->legend->setBrush(Qt::NoBrush);
 
     m_plot->addGraph();
     m_plot->graph(0)->setPen(QPen(Qt::blue));
@@ -52,17 +71,13 @@ MainWindow::MainWindow(Joystick *joystick, Network* network) : QMainWindow(), ui
     m_plot->graph(2)->setPen(QPen(Qt::green));
     m_plot->graph(2)->setName("Yaw");
 
-    m_plot->yAxis->setRangeLower(-20);
-    m_plot->yAxis->setRangeUpper(20);
+    m_plot->yAxis->setRangeLower(-24);
+    m_plot->yAxis->setRangeUpper(24);
 
     m_plot->xAxis->setTickLabelType(QCPAxis::ltDateTime);
     m_plot->xAxis->setDateTimeFormat("hh:mm:ss");
     m_plot->xAxis->setAutoTickStep(false);
     m_plot->xAxis->setTickStep(2);
-    m_plot->axisRect()->setupFullAxesBox();
-
-    connect(m_plot->xAxis, SIGNAL(rangeChanged(QCPRange)), m_plot->xAxis2, SLOT(setRange(QCPRange)));
-    connect(m_plot->yAxis, SIGNAL(rangeChanged(QCPRange)), m_plot->yAxis2, SLOT(setRange(QCPRange)));
 
     connect(ui->save_plot_button, SIGNAL(clicked()), this, SLOT(savePlot()));
 
@@ -96,7 +111,6 @@ void MainWindow::setMeasuredValues(float yaw, float pitch, float roll)
 
     ui->yaw_measured->setValue(yaw);
 
-    ui->attitude_widget->repaint();
 
     double key = QDateTime::currentDateTime().toMSecsSinceEpoch()/1000.0;
     static double lastPointKey = 0;
@@ -110,8 +124,16 @@ void MainWindow::setMeasuredValues(float yaw, float pitch, float roll)
         m_plot->graph(2)->rescaleValueAxis(true);
         lastPointKey = key;
     }
-    m_plot->xAxis->setRange(key+0.25, 12, Qt::AlignRight);
-    m_plot->replot();
+    m_plot->xAxis->setRange(key+0.25, 34, Qt::AlignRight);
+    static char paintCounter = 0;
+    if(paintCounter > 4) // Avoids too many redraws
+    {
+        ui->attitude_widget->repaint();
+        m_plot->replot();
+        paintCounter = 0;
+    }
+    else
+        paintCounter ++;
 }
 
 void MainWindow::setCPUUsage(char usage)
