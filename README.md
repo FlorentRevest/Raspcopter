@@ -8,7 +8,6 @@ This git repo contains three directories,  all of them are related to the same p
     - it filters these values via the DMP of the accelerometer
     - it manages the motors speed via the Pololu Maestro board according to the above values
     - it communicates over wifi with one of the two clients below
- * android-client: The Android smartphone is a wifi hotspot with whom the R-Pi communicates. An app (in java) will also be made to provide a handy controller.
  * laptop-client: This client, written in C++ with Qt is intended to be a complete "ground station" with recorded logs and real-time informations on the quadcopter. The laptop will also connect to the Android smartphone to be on the same local network as the raspberry pi.
 
 ## Used pieces
